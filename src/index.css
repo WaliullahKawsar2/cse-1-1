@@ -40,4 +40,10 @@ body {
   border-radius: 9999px;
 }
 
+/* Remove chart focus borders */
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+svg:focus {
+  outline: none !important;
+}
 
