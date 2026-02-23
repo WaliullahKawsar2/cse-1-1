@@ -322,7 +322,7 @@ function App() {
       });
     }
 
-    if (!search.trim()) return baseRows.slice(0, 50);
+    if (!search.trim()) return baseRows;
     const q = search.toLowerCase();
     return baseRows.filter((row) =>
       Object.values(row).some((value) =>
