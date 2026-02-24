@@ -192,18 +192,19 @@ function metricLabel(key) {
 }
 
 function App() {
-  const { rows, loading, error } = useResults();
+  const { rows: rawRows, loading, error } = useResults();
   const [search, setSearch] = useState('');
   const [selectedRow, setSelectedRow] = useState(null);
   const [activeMetricKeys, setActiveMetricKeys] = useState([]);
   const [onlyWithMetric, setOnlyWithMetric] = useState(false);
+  const [sortMode, setSortMode] = useState('rank'); // 'rank' or 'id'
   const detailRef = useRef(null);
 
-  const textFields = useMemo(() => detectTextFields(rows), [rows]);
-  const numericFields = useMemo(() => detectNumericFields(rows), [rows]);
+  const textFields = useMemo(() => detectTextFields(rawRows), [rawRows]);
+  const numericFields = useMemo(() => detectNumericFields(rawRows), [rawRows]);
   const subjectFields = useMemo(
-    () => extractSubjectFields(rows, textFields),
-    [rows, textFields],
+    () => extractSubjectFields(rawRows, textFields),
+    [rawRows, textFields],
   );
 
   const primaryTextField = useMemo(() => {
@@ -215,7 +216,7 @@ function App() {
   }, [textFields]);
 
   const idField = useMemo(() => {
-    const sample = rows[0];
+    const sample = rawRows[0];
     const keys = sample ? Object.keys(sample) : [];
     const candidates = ['roll', 'reg', 'registration', 'enrol', 'enrollment', 'admission', 'id'];
 
@@ -236,7 +237,7 @@ function App() {
         k.toLowerCase().includes(matchedCandidate),
       ) || null
     );
-  }, [rows, textFields]);
+  }, [rawRows, textFields]);
 
   const primaryNumericField = useMemo(() => {
     if (!numericFields.length) return null;
@@ -262,6 +263,36 @@ function App() {
 
     return numericFields[0];
   }, [numericFields, subjectFields]);
+
+  const rows = useMemo(() => {
+    if (!rawRows.length || !primaryNumericField) return rawRows;
+
+    const validRows = rawRows.map((row, index) => {
+      const val = typeof row[primaryNumericField] === 'number'
+        ? row[primaryNumericField]
+        : parseFloat(row[primaryNumericField]);
+      return { val: Number.isFinite(val) ? val : -1, index };
+    });
+
+    // Sort to determine ranks
+    const sorted = [...validRows].sort((a, b) => b.val - a.val);
+
+    const rankMap = new Map();
+    let currentRank = 1;
+    for (let i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i].val < sorted[i - 1].val) {
+        currentRank = i + 1;
+      }
+      if (sorted[i].val !== -1) {
+        rankMap.set(sorted[i].index, currentRank);
+      }
+    }
+
+    return rawRows.map((row, index) => ({
+      ...row,
+      _position: rankMap.get(index) || null,
+    }));
+  }, [rawRows, primaryNumericField]);
 
   const defaultMetricKey = useMemo(
     () => primaryNumericField || subjectFields[0]?.key || null,
@@ -322,14 +353,35 @@ function App() {
       });
     }
 
-    if (!search.trim()) return baseRows;
+    if (!search.trim()) {
+      return [...baseRows].sort((a, b) => {
+        if (sortMode === 'rank') {
+          return (a._position || 999) - (b._position || 999);
+        }
+        if (idField) {
+          return String(a[idField]).localeCompare(String(b[idField]), undefined, { numeric: true });
+        }
+        return 0;
+      });
+    }
+
     const q = search.toLowerCase();
-    return baseRows.filter((row) =>
-      Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(q),
-      ),
-    );
-  }, [rows, search, onlyWithMetric, filterMetricKey]);
+    return baseRows
+      .filter((row) =>
+        Object.values(row).some((value) =>
+          String(value).toLowerCase().includes(q),
+        ),
+      )
+      .sort((a, b) => {
+        if (sortMode === 'rank') {
+          return (a._position || 999) - (b._position || 999);
+        }
+        if (idField) {
+          return String(a[idField]).localeCompare(String(b[idField]), undefined, { numeric: true });
+        }
+        return 0;
+      });
+  }, [rows, search, onlyWithMetric, filterMetricKey, sortMode, idField]);
 
   const chartData = useMemo(
     () => buildGpaCountData(filteredRows, chartMetricKeys),
@@ -584,89 +636,41 @@ function App() {
                 </p>
               ) : (
                 <div className="mt-4 space-y-4">
-                  <div className="grid gap-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-                    <div className="space-y-2 text-xs text-slate-200">
+                  <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-slate-900/50 p-4 border border-white/5">
+                    <div className="space-y-1">
                       {primaryTextField && (
-                        <div className="flex justify-between gap-3 rounded-xl bg-slate-900/80 px-3 py-2">
-                          <span className="text-[11px] font-medium text-slate-400">
-                            {prettyKey(primaryTextField)}
-                          </span>
-                          <span className="max-w-[60%] text-right text-xs text-slate-100">
-                            {String(selectedRow[primaryTextField] || '—')}
-                          </span>
-                        </div>
+                        <h3 className="text-xl font-bold text-white tracking-tight">
+                          {String(selectedRow[primaryTextField] || '—')}
+                        </h3>
                       )}
-                      {idField && idField !== primaryTextField && (
-                        <div className="flex justify-between gap-3 rounded-xl bg-slate-900/80 px-3 py-2">
-                          <span className="text-[11px] font-medium text-slate-400">
-                            {prettyKey(idField)}
-                          </span>
-                          <span className="max-w-[60%] text-right text-xs text-slate-100">
+                      {idField && (
+                        <div className="flex items-center gap-2 text-slate-400">
+                          <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">REG NO.</span>
+                          <span className="text-xs font-mono font-medium text-slate-300">
                             {String(selectedRow[idField] || '—')}
                           </span>
                         </div>
                       )}
-                      {Object.entries(selectedRow)
-                        .filter(
-                          ([key]) =>
-                            key !== idField &&
-                            key !== primaryTextField &&
-                            key !== primaryNumericField &&
-                            !subjectFields.some((s) => s.key === key),
-                        )
-                        .slice(0, 4)
-                        .map(([key, value]) => (
-                          <div
-                            key={key}
-                            className="flex justify-between gap-3 rounded-xl bg-slate-900/80 px-3 py-2"
-                          >
-                            <span className="text-[11px] font-medium text-slate-400">
-                              {prettyKey(key)}
-                            </span>
-                            <span className="max-w-[60%] text-right text-xs text-slate-100">
-                              {String(value || '—')}
-                            </span>
-                          </div>
-                        ))}
                     </div>
 
-                    <div className="flex flex-col gap-3 rounded-2xl bg-slate-950/70 p-3 text-xs text-slate-300">
+                    <div className="flex flex-wrap items-center gap-3">
                       {primaryNumericField && (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-medium text-slate-400">
-                              {metricLabel(primaryNumericField)}
-                            </span>
-                            <span className="text-sm font-semibold text-emerald-400">
-                              {selectedRow[primaryNumericField] ?? '—'}
-                            </span>
-                          </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-                            <div
-                              className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-blue-500"
-                              style={{
-                                width:
-                                  summary.maxScore && selectedRow[primaryNumericField] != null
-                                    ? `${Math.max(
-                                      8,
-                                      Math.min(
-                                        100,
-                                        (Number(selectedRow[primaryNumericField]) /
-                                          summary.maxScore) *
-                                        100,
-                                      ),
-                                    )}%`
-                                    : '40%',
-                              }}
-                            />
-                          </div>
-                        </>
+                        <div className="flex flex-col items-center justify-center px-5 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.08)]">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 mb-0.5">{metricLabel(primaryNumericField)}</span>
+                          <span className="text-2xl font-black text-white leading-none">
+                            {selectedRow[primaryNumericField] ?? '—'}
+                          </span>
+                        </div>
                       )}
-                      {/* <div className="mt-1">
-                        <p className="text-[11px] text-slate-400">
-                          Quickly compare this record with others using the search above and the distribution chart on the right.
-                        </p>
-                      </div> */}
+                      {selectedRow._position != null && (
+                        <div className="flex flex-col items-center justify-center px-5 py-2 rounded-2xl bg-gradient-to-br from-sky-500/20 to-emerald-500/20 border border-sky-500/20 shadow-[0_0_20px_rgba(14,165,233,0.1)]">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-400 mb-0.5">CLASS RANK</span>
+                          <span className="text-2xl font-black text-white leading-none">
+                            <span className="text-sky-400 font-bold text-sm mr-0.5">#</span>
+                            {selectedRow._position}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -749,8 +753,21 @@ function App() {
                   </div>
                   <span className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Registration Index</span>
                 </div>
-                <div className="text-[10px] text-slate-500 font-medium bg-slate-800/50 px-2 py-0.5 rounded-full">
-                  Sorted by Entry
+                <div className="flex items-center gap-2">
+                  <div className="flex rounded-lg bg-slate-800/50 p-0.5 border border-white/5">
+                    <button
+                      onClick={() => setSortMode('rank')}
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'rank' ? 'bg-emerald-500/20 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
+                    >
+                      RANK
+                    </button>
+                    <button
+                      onClick={() => setSortMode('id')}
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'id' ? 'bg-sky-500/20 text-sky-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
+                    >
+                      REG NO
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="flex-1 overflow-auto">
@@ -774,6 +791,9 @@ function App() {
                   <table className="min-w-full border-separate border-spacing-0 text-left text-xs">
                     <thead className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur">
                       <tr>
+                        <th className="border-b border-slate-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 w-12 text-center">
+                          Pos
+                        </th>
                         {primaryTextField && primaryTextField !== idField && (
                           <th className="border-b border-slate-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
                             {prettyKey(primaryTextField)}
@@ -800,6 +820,9 @@ function App() {
                                 : 'hover:bg-slate-900/80'
                               }`}
                           >
+                            <td className="px-4 py-2 text-center text-[10px] font-bold text-sky-400/80">
+                              {row._position ? `#${row._position}` : '—'}
+                            </td>
                             {primaryTextField && primaryTextField !== idField && (
                               <td className="max-w-[180px] px-4 py-2 text-xs text-slate-200">
                                 <div className="truncate" title={String(row[primaryTextField] ?? '')}>
