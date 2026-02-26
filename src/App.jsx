@@ -451,7 +451,7 @@ function App() {
   useEffect(() => {
     if (!rows.length || selectedRow) return;
 
-    const targetReg = '2024331080';
+    const targetReg = '2024331008';
     let initial = null;
 
     if (idField) {
