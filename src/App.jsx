@@ -451,7 +451,7 @@ function App() {
   useEffect(() => {
     if (!rows.length || selectedRow) return;
 
-    const targetReg = '2024331008';
+    const targetReg = '2024331080';
     let initial = null;
 
     if (idField) {
@@ -481,8 +481,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         {/* Header Section */}
         <header className="mb-8 space-y-6">
           <div className="flex flex-wrap items-end justify-between gap-6">
@@ -497,19 +497,19 @@ function App() {
               <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
                 Result <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-sky-400">Portal</span>
               </h1>
-              <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
+              <p className="text-sm leading-relaxed text-slate-400">
                 Detailed academic performance overview for the 1st Year, 1st Semester.
                 Explore individual grades, subject-wise breakdowns, and class-wise analytics.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <div className="glass-panel px-5 py-3 !rounded-2xl flex flex-col items-center justify-center min-w-[120px]">
+              <div className="glass-panel px-4 py-3 !rounded-2xl flex flex-col items-center justify-center">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Students</span>
                 <span className="text-2xl font-black text-white">{summary.totalStudents || 0}</span>
               </div>
               {summary.avgScore && (
-                <div className="glass-panel px-5 py-3 !rounded-2xl flex flex-col items-center justify-center min-w-[120px] bg-emerald-500/5 border-emerald-500/20">
+                <div className="glass-panel px-4 py-3 !rounded-2xl flex flex-col items-center justify-center bg-emerald-500/5 border-emerald-500/20">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70">Class Average</span>
                   <span className="text-2xl font-black text-emerald-400">{summary.avgScore.toFixed(2)}</span>
                 </div>
@@ -521,39 +521,29 @@ function App() {
         {/* Main content */}
         <main className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           {/* Left: search + details + table */}
-          <section className="space-y-4">
-            <div className="glass-panel relative overflow-hidden p-4 sm:p-5">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_bottom,_rgba(16,185,129,0.18),transparent_55%)]" />
-              <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                      Search Students
-                    </label>
-                  </div>
-                  <div className="mt-1 flex items-center gap-2 rounded-2xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-sm shadow-[0_18px_55px_rgba(15,23,42,0.9)] focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/40">
+          <section className="flex min-w-0 flex-col space-y-4">
+            <div className="glass-panel relative p-4 sm:p-5">
+              <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.12),transparent_55%),radial-gradient(circle_at_bottom,_rgba(16,185,129,0.18),transparent_55%)]" />
+              <div className="relative flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                    Search Students
+                  </label>
+                </div>
+
+                <div className="relative">
+                  <div className="flex items-center gap-2 rounded-2xl border border-emerald-500/40 bg-slate-900/80 px-3 py-2.5 text-sm shadow-[0_0_0_1px_rgba(16,185,129,0.08),0_0_24px_rgba(16,185,129,0.13)] focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/50 focus-within:shadow-[0_0_0_1px_rgba(16,185,129,0.15),0_0_32px_rgba(16,185,129,0.22)] transition-all duration-200">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       className="h-4 w-4 flex-shrink-0 text-slate-400"
                       aria-hidden="true"
                     >
-                      <path
-                        d="M15.5 15.5 20 20"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                      <circle
-                        cx="11"
-                        cy="11"
-                        r="5.5"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                      />
+                      <path d="M15.5 15.5 20 20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                      <circle cx="11" cy="11" r="5.5" stroke="currentColor" strokeWidth="1.6" />
                     </svg>
                     <input
                       type="text"
@@ -566,43 +556,51 @@ function App() {
                       <button
                         type="button"
                         onClick={() => setSearch('')}
-                        className="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-300 hover:bg-slate-700"
+                        className="rounded-full bg-slate-800 px-2 py-1 text-[10px] font-medium text-slate-300 hover:bg-slate-700 transition-colors"
                       >
                         Clear
                       </button>
                     )}
                   </div>
-                  <p className="mt-1.5 text-[11px] text-slate-400">
-                    Showing{' '}
-                    <span className="font-semibold text-slate-200">
-                      {filteredRows.length}
-                    </span>{' '}
-                    matching record{filteredRows.length === 1 ? '' : 's'}. Click a row to view details.
-                  </p>
+
                   {search.trim() && filteredRows.length > 0 && (
-                    <div className="mt-2 max-h-48 overflow-y-auto rounded-2xl border border-slate-800/80 bg-slate-950/90 p-1 text-xs text-slate-200 shadow-[0_18px_45px_rgba(15,23,42,0.9)] scrollbar-soft">
-                      {filteredRows.slice(0, 6).map((row, idx) => (
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1.5 max-h-52 overflow-y-auto rounded-2xl border border-slate-700/80 bg-slate-950/95 p-1.5 text-xs text-slate-200 shadow-[0_24px_50px_rgba(2,6,23,0.95)] backdrop-blur-xl scrollbar-soft">
+                      {filteredRows.slice(0, 8).map((row, idx) => (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => handleSearchResultClick(row)}
-                          className="flex w-full items-center justify-between gap-3 rounded-xl px-2 py-1.5 text-left hover:bg-slate-900/80"
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-slate-800/80 transition-colors"
                         >
-                          <div className="flex flex-col">
-                            <span className="text-[11px] font-medium text-slate-100">
-                              {primaryTextField ? row[primaryTextField] || 'Unknown' : 'Result'}
-                            </span>
-                            <span className="text-[10px] text-slate-400">
-                              {primaryNumericField && row[primaryNumericField] != null
-                                ? `${prettyKey(primaryNumericField)}: ${row[primaryNumericField]}`
-                                : 'Tap to open full result'}
+                          <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-slate-800 border border-slate-700/50">
+                            <span className="text-[9px] font-bold text-sky-400">
+                              {row._position ? `#${row._position}` : '—'}
                             </span>
                           </div>
+                          <div className="flex flex-1 flex-col min-w-0">
+                            <span className="truncate text-[11px] font-semibold text-slate-100">
+                              {primaryTextField ? row[primaryTextField] || 'Unknown' : 'Result'}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-mono">
+                              {idField ? row[idField] : ''}
+                            </span>
+                          </div>
+                          {primaryNumericField && row[primaryNumericField] != null && (
+                            <span className="flex-shrink-0 text-[11px] font-black text-emerald-400">
+                              {row[primaryNumericField]}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
+
+                <p className="text-[11px] text-slate-500">
+                  Showing{' '}
+                  <span className="font-semibold text-slate-300">{filteredRows.length}</span>{' '}
+                  record{filteredRows.length === 1 ? '' : 's'}. Click a card to view details.
+                </p>
               </div>
             </div>
 
@@ -743,103 +741,110 @@ function App() {
               )}
             </div>
 
-            <div className="glass-panel flex min-h-[300px] flex-col overflow-hidden">
+            <div className="glass-panel flex h-[440px] flex-col overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/5 px-4 py-3 bg-white/5">
                 <div className="flex items-center gap-2.5">
                   <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                     <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Registration Index</span>
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-slate-300">Student List</span>
+                  <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-400 border border-slate-700/50">
+                    {filteredRows.length}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex rounded-lg bg-slate-800/50 p-0.5 border border-white/5">
-                    <button
-                      onClick={() => setSortMode('rank')}
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'rank' ? 'bg-emerald-500/20 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
-                    >
-                      RANK
-                    </button>
-                    <button
-                      onClick={() => setSortMode('id')}
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'id' ? 'bg-sky-500/20 text-sky-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
-                    >
-                      REG NO
-                    </button>
-                  </div>
+                <div className="flex rounded-lg bg-slate-800/50 p-0.5 border border-white/5">
+                  <button
+                    onClick={() => setSortMode('rank')}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'rank' ? 'bg-emerald-500/20 text-emerald-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
+                  >
+                    RANK
+                  </button>
+                  <button
+                    onClick={() => setSortMode('id')}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${sortMode === 'id' ? 'bg-sky-500/20 text-sky-400 shadow-sm' : 'text-slate-500 hover:text-slate-400'}`}
+                  >
+                    REG NO
+                  </button>
                 </div>
               </div>
-              <div className="flex-1 overflow-auto">
+
+              <div className="flex-1 overflow-y-auto scrollbar-soft p-3">
                 {loading ? (
-                  <div className="flex h-full items-center justify-center px-4 py-10 text-sm text-slate-400">
+                  <div className="flex h-full items-center justify-center py-10 text-sm text-slate-400">
                     <div className="flex items-center gap-3">
                       <span className="inline-flex h-2 w-2 animate-ping rounded-full bg-emerald-400" />
                       Loading results from Excel&hellip;
                     </div>
                   </div>
                 ) : error ? (
-                  <div className="flex h-full items-center justify-center px-4 py-10 text-sm text-rose-300">
+                  <div className="flex h-full items-center justify-center py-10 text-sm text-rose-300">
                     {error}
                   </div>
                 ) : !rows.length ? (
-                  <div className="flex h-full items-center justify-center px-4 py-10 text-sm text-slate-400">
-                    No rows found in the first sheet of <span className="ml-1 font-mono text-slate-200">result.xlsx</span>.
-                    Make sure the first row contains headers.
+                  <div className="flex h-full items-center justify-center py-10 text-sm text-slate-400">
+                    No rows found in <span className="ml-1 font-mono text-slate-200">result.xlsx</span>.
                   </div>
                 ) : (
-                  <table className="min-w-full border-separate border-spacing-0 text-left text-xs">
-                    <thead className="sticky top-0 z-10 bg-slate-950/90 backdrop-blur">
-                      <tr>
-                        <th className="border-b border-slate-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 w-12 text-center">
-                          Pos
-                        </th>
-                        {primaryTextField && primaryTextField !== idField && (
-                          <th className="border-b border-slate-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                            {prettyKey(primaryTextField)}
-                          </th>
-                        )}
-                        {idField && (
-                          <th className="border-b border-slate-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 text-right">
-                            {prettyKey(idField)}
-                          </th>
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredRows.map((row, idx) => {
-                        const isActive = selectedRow === row;
-                        return (
-                          <tr
-                            key={idx}
-                            onClick={() => handleRowClick(row)}
-                            className={`cursor-pointer align-middle transition-colors ${isActive
-                              ? 'bg-emerald-500/10 hover:bg-emerald-500/15'
-                              : idx % 2 === 0
-                                ? 'hover:bg-slate-900/70'
-                                : 'hover:bg-slate-900/80'
-                              }`}
-                          >
-                            <td className="px-4 py-2 text-center text-[10px] font-bold text-sky-400/80">
-                              {row._position ? `#${row._position}` : '—'}
-                            </td>
-                            {primaryTextField && primaryTextField !== idField && (
-                              <td className="max-w-[180px] px-4 py-2 text-xs text-slate-200">
-                                <div className="truncate" title={String(row[primaryTextField] ?? '')}>
-                                  {row[primaryTextField] ?? '—'}
+                  <div className="flex flex-col gap-2">
+                    {filteredRows.map((row, idx) => {
+                      const isActive = selectedRow === row;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => handleRowClick(row)}
+                          className={`cursor-pointer rounded-2xl border p-3 transition-all duration-150 ${isActive
+                            ? 'border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_16px_rgba(16,185,129,0.12)]'
+                            : 'border-slate-700/40 bg-slate-900/50 hover:border-slate-600/60 hover:bg-slate-800/60'
+                            }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Rank badge */}
+                            <div className={`flex h-10 w-10 flex-shrink-0 flex-col items-center justify-center rounded-xl border ${isActive
+                              ? 'border-sky-500/40 bg-sky-500/10'
+                              : 'border-slate-700/50 bg-slate-800/80'
+                              }`}>
+                              <span className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Rank</span>
+                              <span className="text-xs font-black text-sky-400 leading-none">
+                                {row._position ? `#${row._position}` : '—'}
+                              </span>
+                            </div>
+
+                            {/* Name + Reg */}
+                            <div className="flex-1 min-w-0">
+                              {primaryTextField && (
+                                <div className="truncate text-sm font-semibold text-slate-100" title={String(row[primaryTextField] ?? '')}>
+                                  {row[primaryTextField] || '—'}
                                 </div>
-                              </td>
+                              )}
+                              {idField && (
+                                <div className="mt-0.5 text-[10px] font-mono text-slate-500">
+                                  {row[idField] || '—'}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* CGPA badge */}
+                            {primaryNumericField && row[primaryNumericField] != null && (
+                              <div className={`flex flex-shrink-0 flex-col items-center justify-center rounded-xl border px-3 py-1.5 ${isActive
+                                ? 'border-emerald-500/40 bg-emerald-500/15'
+                                : 'border-slate-700/40 bg-slate-800/60'
+                                }`}>
+                                <span className="text-[9px] font-bold uppercase tracking-wide text-slate-500">
+                                  {metricLabel(primaryNumericField)}
+                                </span>
+                                <span className={`text-sm font-black leading-none ${isActive ? 'text-emerald-300' : 'text-emerald-400'
+                                  }`}>
+                                  {row[primaryNumericField]}
+                                </span>
+                              </div>
                             )}
-                            {idField && (
-                              <td className="whitespace-nowrap px-4 py-2 text-right text-xs text-slate-100">
-                                {row[idField] ?? '—'}
-                              </td>
-                            )}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>
